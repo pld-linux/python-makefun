@@ -1,15 +1,17 @@
+# TODO: package mkdocs output (site/...)
 #
 # Conditional build:
-%bcond_without	doc	# Sphinx documentation
+%bcond_with	doc	# mkdocs documentation
 %bcond_without	tests	# unit tests
 %bcond_without	python2 # CPython 2.x module
-%bcond_without	python3 # CPython 3.x module
+%bcond_with	python3 # CPython 3.x module (built from python3-makefun.spec)
 
 Summary:	Small library to dynamically create Python functions
 Summary(pl.UTF-8):	Mała biblioteka do dynamicznego tworzenia funkcji w Pythonie
 Name:		python-makefun
+# keep 1.15.x here for python2 support
 Version:	1.15.6
-Release:	1
+Release:	2
 License:	BSD
 Group:		Libraries/Python
 #Source0Download: https://pypi.org/simple/makefun/
@@ -34,6 +36,12 @@ BuildRequires:	python3-setuptools_scm
 %if %{with tests}
 BuildRequires:	python3-pytest
 %endif
+%endif
+%if %{with doc}
+BuildRequires:	python-mkdocs
+BuildRequires:	python-mkdocs-material
+BuildRequires:	python-pygments
+BuildRequires:	python-pymdown-extensions
 %endif
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
@@ -81,6 +89,10 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
 PYTHONPATH=$(pwd)/src \
 %{__python3} -m pytest tests
 %endif
+%endif
+
+%if %{with doc}
+mkdocs-2 build
 %endif
 
 %install
